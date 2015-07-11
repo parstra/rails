@@ -221,13 +221,17 @@ module ActionView
 
         options = options.reverse_merge(defaults)
 
+        format = options.fetch(:format, "%n%")
+
         begin
-          "#{number_with_precision(number, options.merge(:raise => true))}%".html_safe
+          formatted_number = number_with_precision(number, options.merge(:raise => true))
+          format.gsub(/%n/, formatted_number).html_safe
         rescue InvalidNumberError => e
           if options[:raise]
             raise
           else
-            e.number.to_s.html_safe? ? "#{e.number}%".html_safe : "#{e.number}%"
+            formatted = format.gsub(/%n/, e.number)
+            e.number.to_s.html_safe? ? formatted.html_safe : formatted
           end
         end
       end

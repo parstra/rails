@@ -39,6 +39,12 @@ class NumberHelperTest < ActionView::TestCase
         :precision => { :format => {:delimiter => '', :significant => true} }
       },
       :custom_units_for_number_to_human => {:mili => "mm", :centi => "cm", :deci => "dm", :unit => "m", :ten => "dam", :hundred => "hm", :thousand => "km"}
+
+    I18n.backend.store_translations 'tr',
+      :number => {
+        :format => { :precision => 3, :delimiter => ',', :separator => '.', :significant => false, :strip_insignificant_zeros => false },
+        :percentage => { :format => {:delimiter => '', :precision => 2, :strip_insignificant_zeros => true, :format => "%%n"} },
+      }
   end
 
   def test_number_to_i18n_currency
@@ -82,6 +88,10 @@ class NumberHelperTest < ActionView::TestCase
     assert_equal("1.24%", number_to_percentage(1.2434, :locale => 'ts'))
     # no delimiter
     assert_equal("12434%", number_to_percentage(12434, :locale => 'ts'))
+    # locale specific format
+    assert_equal("%12", number_to_percentage(12, :locale => 'tr'))
+    # custom format overrides locale
+    assert_equal("12 %", number_to_percentage(12, :locale => 'tr', :format => "%n %"))
   end
 
   def test_number_to_i18n_human_size
